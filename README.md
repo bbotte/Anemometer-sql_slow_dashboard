@@ -144,3 +144,42 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+
+### install doc
+
+centos 7
+mysql 5.7
+
+    wget https://www.percona.com/downloads/percona-toolkit/3.0.10/binary/redhat/7/x86_64/percona-toolkit-3.0.10-1.el7.x86_64.rpm
+    yum localinstall percona-toolkit-3.0.10-1.el7.x86_64.rpm -y
+    
+    yum install httpd httpd-devel -y
+    yum install php php-mysql php-common php-bcmath php-dba php-cli php-gd php-mbstring php-mcrypt php-devel php-xml php-pdo -y
+    vim /etc/php.ini，修改为 date.timezone = PRC
+
+    git clone https://github.com/bbotte/Anemometer-sql_slow_dashboard.git
+    mkdir -p /var/www/html/
+    mv Anemometer /var/www/html/anemometer
+    
+    mysql -h 192.168.0.1 -uroot -p
+    source /var/www/html/anemometer/install.sql
+    source /var/www/html/anemometer/mysql56-install.sql
+    quit
+    
+    cd /var/www/html/anemometer/conf
+    cp conf/sample.config.inc.php conf/config.inc.php
+    vim conf/config.inc.php
+    249 $conf['plugins'] = array(
+    ...
+    285                 $conn['user'] = 'anemometer';
+    286                 $conn['password'] = 'superSecurePass';
+    vim conf/datasource_localhost.inc.php
+    change your sql connection info
+    
+    pt-query-digest --user=anemometer --password=superSecurePass --review h=192.168.0.1,D=slow_query_log,t=global_query_review  --history h=192.168.0.1,D=slow_query_log,t=global_query_review_history --no-report --limit=0% --filter=" \$event->{Bytes} = length(\$event->{arg}) and \$event->{hostname}=\"$HOSTNAME\""  ./slow.log
+
+    systemctl start httpd
+
+浏览器访问 http://IP/anemometer
+
