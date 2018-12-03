@@ -183,3 +183,13 @@ mysql 5.7
 
 浏览器访问 http://IP/anemometer
 
+```
+1、对于anemometer的主机上，需要进行慢查询主机hostname和ip的映射（修改/etc/hosts进行配置），目的在于慢查询explain执行计划的目标主机解析
+    #collect mysql slowquery log into lepus database步骤中，$HOSTNAME:$mysql_port
+    数据库存取的格式，hostname_max类似这种，cnwangdawei:5700
+2、中文乱码的问题，在#collect mysql slowquery log into lepus database步骤中添加 --charset=utf8
+3、慢查询主机数据库是5.7版本的数据库，可能出现界面ts_cnt不显示，替换percona toolkit为新版本，2.x.x -----> 3.x.x
+4、表结构和状态字符集显示乱码，添加mysqli的字符集设定，vim /var/www/html/anemometer/lib/QueryExplain.php
+    新增（194行后增加），$this->mysqli->query("set names utf8");
+
+```
