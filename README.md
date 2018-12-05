@@ -165,6 +165,8 @@ mysql 5.7
     mysql -h 192.168.0.1 -uroot -p
     source /var/www/html/anemometer/install.sql
     source /var/www/html/anemometer/mysql56-install.sql
+    grant ALL ON slow_query_log.* to 'anemometer'@'%' IDENTIFIED BY 'superSecurePass';
+    flush privileges;
     quit
     
     cd /var/www/html/anemometer/conf
